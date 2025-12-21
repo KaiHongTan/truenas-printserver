@@ -15,6 +15,7 @@ PERSISTENT_SAMBA_DIR="/config/samba" # Your mounted volume for samba
 # Check and copy Avahi config if the persistent volume is empty
 if [ ! -f "${PERSISTENT_AVAHI_DIR}/avahi-daemon.conf" ]; then
     echo "Initializing Avahi config in persistent volume..."
+    mkdir -p "${PERSISTENT_AVAHI_DIR}/services"
     cp "${INITIAL_CONFIG_DIR}/avahi/avahi-daemon.conf" "${PERSISTENT_AVAHI_DIR}/"
     cp "${INITIAL_CONFIG_DIR}/avahi/services/airprint.service" "${PERSISTENT_AVAHI_DIR}/services/" # Assuming 'services' sub-directory
 fi
