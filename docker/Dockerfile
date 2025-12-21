@@ -21,6 +21,7 @@ RUN apt-get update && apt-get install -y \
     inotify-tools \
     sudo \
     dbus \
+    openssl \
     && rm -rf /var/lib/apt/lists/*
 
 # Create necessary directories

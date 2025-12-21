@@ -26,8 +26,16 @@ ln -s "${PERSISTENT_AVAHI_DIR}" /etc/avahi
 # Check and copy CUPS config if the persistent volume is empty
 if [ ! -f "${PERSISTENT_CUPS_DIR}/cupsd.conf" ]; then
     echo "Initializing CUPS config in persistent volume..."
+    mkdir -p "${PERSISTENT_CUPS_DIR}/certs" # <--- ADD THIS LINE (if not there already)
     cp "${INITIAL_CONFIG_DIR}/cups/cupsd.conf" "${PERSISTENT_CUPS_DIR}/"
     cp "${INITIAL_CONFIG_DIR}/cups/cups-pdf.conf" "${PERSISTENT_CUPS_DIR}/"
+
+    # Ensure correct permissions for the certs directory (CUPS often runs as 'lp' user)
+    # The 'lp' user and group usually handle CUPS daemon processes.
+    # You might need to verify the exact group for 'lp' on debian:bookworm-slim.
+    # On many systems, the user and group are both 'lp'.
+    chown -R lp:lp "${PERSISTENT_CUPS_DIR}/certs"
+    chmod 700 "${PERSISTENT_CUPS_DIR}/certs"
 fi
 # Link the actual config directory to the persistent one
 rm -rf /etc/cups
@@ -55,18 +63,23 @@ shutdown_handler() {
 
 trap shutdown_handler SIGTERM SIGINT
 
-# Create necessary directories if they don't exist
 mkdir -p /var/spool/samba
 mkdir -p /var/lib/samba/printers
 mkdir -p /var/spool/cups-pdf
-mkdir -p /run/cups/certs
-mkdir -p /var/run/dbus
+# Remove '/run/cups/certs' from here, as we are managing persistent certs in /config/cups/certs
+# mkdir -p /run/cups/certs # <--- REMOVE THIS LINE
+mkdir -p /var/run/dbus # This is still correct for dbus
 
-# Set permissions
+# --- Add/Adjust /run/cups (runtime directory) permissions BEFORE CUPS starts ---
+# CUPS needs to write PID files and sockets to /run/cups
+mkdir -p /run/cups
+chown -R lp:lp /run/cups # Ensure 'lp' user can write here
+chmod 755 /run/cups
+
+# Set permissions (Keep existing permissions, but ensure the new certs dir is handled)
 chmod 1777 /var/spool/samba
 chmod 755 /var/lib/samba/printers
 chmod 1777 /var/spool/cups-pdf
-chmod 755 /run/cups/certs
 
 # Start D-Bus (required for Avahi)
 echo "Starting D-Bus..."
