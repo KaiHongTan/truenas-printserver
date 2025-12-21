@@ -1,0 +1,37 @@
+{
+  "truenas-printserver": {
+    "name": "truenas-printserver",
+    "categories": [
+      "networking",
+      "media"
+    ],
+    "app_readme": "Complete network print server with CUPS, Samba, and Avahi",
+    "location": "trains/charts/truenas-printserver",
+    "healthy": true,
+    "healthy_error": null,
+    "latest_version": "1.0.0",
+    "latest_app_version": "1.0.0",
+    "latest_human_version": "1.0.0",
+    "last_update": "2024-12-21 00:00:00",
+    "recommended": false,
+    "title": "TrueNAS Print Server",
+    "maintainers": [
+      {
+        "name": "Your Name",
+        "email": "your.email@example.com"
+      }
+    ],
+    "tags": [
+      "printer",
+      "cups",
+      "samba",
+      "airprint",
+      "network"
+    ],
+    "home": "https://github.com/KaiHongTan/truenas-printserver",
+    "sources": [
+      "https://github.com/KaiHongTan/truenas-printserver"
+    ],
+    "icon_url": "https://raw.githubusercontent.com/KaiHongTan/truenas-printserver/main/icon.svg"
+  }
+}

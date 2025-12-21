@@ -1,0 +1,21 @@
+apiVersion: v2
+name: truenas-printserver
+version: 1.0.0
+kubeVersion: ">=1.16.0-0"
+description: All-in-one network print server with CUPS, Samba, and Avahi for maximum cross-platform compatibility
+type: application
+keywords:
+  - cups
+  - printing
+  - samba
+  - airprint
+  - network-printer
+  - print-server
+home: https://github.com/KaiHongTan/truenas-printserver
+sources:
+  - https://github.com/KaiHongTan/truenas-printserver
+maintainers:
+  - name: Your Name
+    email: your.email@example.com
+icon: https://raw.githubusercontent.com/KaiHongTan/truenas-printserver/main/icon.png
+appVersion: "1.0.0"

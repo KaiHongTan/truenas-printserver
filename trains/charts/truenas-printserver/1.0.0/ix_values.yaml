@@ -1,0 +1,37 @@
+# TrueNAS Scale specific value overrides
+# These values are automatically applied when deploying via TrueNAS UI
+
+image:
+  repository: ghcr.io/KaiHongTan/truenas-printserver
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# Enable host networking by default for best compatibility
+networking:
+  hostNetwork: true
+  dnsPolicy: ClusterFirstWithHostNet
+
+# Enable privileged mode for USB access
+securityContext:
+  privileged: true
+  capabilities:
+    add:
+      - NET_ADMIN
+      - NET_RAW
+      - NET_BIND_SERVICE
+      - SYS_ADMIN
+
+# Enable persistent storage by default
+persistence:
+  config:
+    enabled: true
+    size: 1Gi
+  spool:
+    enabled: true
+    size: 5Gi
+
+# Enable USB device support by default
+usbDevices:
+  enabled: true
+  hostPath: /dev/bus/usb
+  mountPath: /dev/bus/usb

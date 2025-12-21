@@ -1,0 +1,152 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "truenas-printserver.fullname" . }}
+  labels:
+    {{- include "truenas-printserver.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "truenas-printserver.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "truenas-printserver.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- if .Values.networking.hostNetwork }}
+      hostNetwork: true
+      dnsPolicy: {{ .Values.networking.dnsPolicy }}
+      {{- end }}
+      containers:
+      - name: printserver
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        securityContext:
+          privileged: {{ .Values.securityContext.privileged }}
+          capabilities:
+            add:
+              {{- range .Values.securityContext.capabilities.add }}
+              - {{ . }}
+              {{- end }}
+        ports:
+        - name: cups
+          containerPort: 631
+          protocol: TCP
+        - name: smb
+          containerPort: 445
+          protocol: TCP
+        - name: netbios
+          containerPort: 139
+          protocol: TCP
+        - name: netbios-ns
+          containerPort: 137
+          protocol: UDP
+        - name: netbios-dgm
+          containerPort: 138
+          protocol: UDP
+        - name: mdns
+          containerPort: 5353
+          protocol: UDP
+        env:
+        - name: TZ
+          value: {{ .Values.env.TZ | quote }}
+        - name: WORKGROUP
+          value: {{ .Values.env.WORKGROUP | quote }}
+        - name: SERVER_NAME
+          value: {{ .Values.env.SERVER_NAME | quote }}
+        - name: CUPS_MAX_JOBS
+          value: {{ .Values.advanced.cups.maxJobs | quote }}
+        - name: CUPS_LOG_LEVEL
+          value: {{ .Values.advanced.cups.logLevel | quote }}
+        - name: SAMBA_GUEST_ACCESS
+          value: {{ .Values.advanced.samba.guestAccess | quote }}
+        - name: SAMBA_WINS_SUPPORT
+          value: {{ .Values.advanced.samba.winsSupport | quote }}
+        - name: AVAHI_IPV6
+          value: {{ .Values.advanced.avahi.ipv6 | quote }}
+        - name: AVAHI_HOSTNAME
+          value: {{ .Values.advanced.avahi.hostname | quote }}
+        - name: AVAHI_DOMAIN
+          value: {{ .Values.advanced.avahi.domain | quote }}
+        volumeMounts:
+        {{- if .Values.persistence.config.enabled }}
+        - name: config
+          mountPath: /etc/cups
+          subPath: cups
+        - name: config
+          mountPath: /etc/samba
+          subPath: samba
+        - name: config
+          mountPath: /etc/avahi
+          subPath: avahi
+        {{- end }}
+        {{- if .Values.persistence.spool.enabled }}
+        - name: spool
+          mountPath: /var/spool/cups
+          subPath: cups
+        - name: spool
+          mountPath: /var/spool/samba
+          subPath: samba
+        - name: spool
+          mountPath: /var/spool/cups-pdf
+          subPath: cups-pdf
+        {{- end }}
+        {{- if .Values.usbDevices.enabled }}
+        - name: usb-devices
+          mountPath: {{ .Values.usbDevices.mountPath }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        livenessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - "lpstat -r"
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          tcpSocket:
+            port: cups
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+      volumes:
+      {{- if .Values.persistence.config.enabled }}
+      - name: config
+        persistentVolumeClaim:
+          claimName: {{ include "truenas-printserver.fullname" . }}-config
+      {{- end }}
+      {{- if .Values.persistence.spool.enabled }}
+      - name: spool
+        persistentVolumeClaim:
+          claimName: {{ include "truenas-printserver.fullname" . }}-spool
+      {{- end }}
+      {{- if .Values.usbDevices.enabled }}
+      - name: usb-devices
+        hostPath:
+          path: {{ .Values.usbDevices.hostPath }}
+          type: Directory
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

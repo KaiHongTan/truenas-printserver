@@ -1,0 +1,92 @@
+# Default values for TrueNAS Print Server
+# This configuration is optimized for TrueNAS Scale deployment
+
+image:
+  repository: ghcr.io/KaiHongTan/truenas-printserver
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# Network Configuration
+networking:
+  # Use host network for best auto-discovery (recommended)
+  hostNetwork: true
+  # DNS policy when using host network
+  dnsPolicy: ClusterFirstWithHostNet
+  
+  # Service configuration (only used if hostNetwork is false)
+  service:
+    type: NodePort
+    cupsPort: 631
+    cupsNodePort: 30631
+    smbPort: 445
+    smbNodePort: 30445
+    netbiosPort: 139
+    netbiosNodePort: 30139
+
+# Security Context (required for USB access)
+securityContext:
+  privileged: true
+  capabilities:
+    add:
+      - NET_ADMIN
+      - NET_RAW
+      - NET_BIND_SERVICE
+      - SYS_ADMIN
+
+# Resource Limits
+resources:
+  limits:
+    cpu: 1000m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# Persistent Storage
+persistence:
+  config:
+    enabled: true
+    type: ixVolume
+    mountPath: /etc/cups
+    hostPathEnabled: false
+    size: 1Gi
+    
+  spool:
+    enabled: true
+    type: ixVolume
+    mountPath: /var/spool/cups
+    hostPathEnabled: false
+    size: 5Gi
+
+# USB Device Passthrough
+usbDevices:
+  enabled: true
+  hostPath: /dev/bus/usb
+  mountPath: /dev/bus/usb
+
+# Environment Variables
+env:
+  TZ: UTC
+  WORKGROUP: WORKGROUP
+  SERVER_NAME: TrueNAS-Print
+
+# Advanced Settings
+advanced:
+  cups:
+    maxJobs: 500
+    logLevel: warn
+  
+  samba:
+    guestAccess: true
+    winsSupport: true
+  
+  avahi:
+    ipv6: true
+    hostname: truenas-print
+    domain: local
+
+# Pod Configuration
+podAnnotations: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}

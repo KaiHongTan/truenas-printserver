@@ -1,0 +1,29 @@
+name: truenas-printserver
+categories:
+  - networking
+  - media
+app_readme: |
+  # TrueNAS Print Server
+  
+  Complete network print server solution with maximum cross-platform compatibility.
+  
+  ## Features
+  
+  - **CUPS** - Industry-standard UNIX printing system
+  - **Samba** - Windows SMB printer sharing  
+  - **Avahi/mDNS** - Auto-discovery for macOS, iOS, and Linux
+  - **AirPrint** - Native wireless printing for Apple devices
+  - **IPP** - Modern internet printing protocol
+  
+  ## Quick Start
+  
+  1. Deploy with default settings (Host Network recommended)
+  2. Connect USB printer to TrueNAS
+  3. Access CUPS at http://[NAS-IP]:631
+  4. Add printer and enable sharing
+  5. Print from any device!
+  
+  ## Documentation
+  
+  Full documentation available at: https://github.com/KaiHongTan/truenas-printserver
+icon_url: https://raw.githubusercontent.com/KaiHongTan/truenas-printserver/main/icon.svg

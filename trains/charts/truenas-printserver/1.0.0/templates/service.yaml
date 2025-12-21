@@ -1,0 +1,46 @@
+{{- if not .Values.networking.hostNetwork }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "truenas-printserver.fullname" . }}
+  labels:
+    {{- include "truenas-printserver.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.networking.service.type }}
+  ports:
+  - name: cups
+    port: {{ .Values.networking.service.cupsPort }}
+    targetPort: cups
+    protocol: TCP
+    {{- if and (eq .Values.networking.service.type "NodePort") .Values.networking.service.cupsNodePort }}
+    nodePort: {{ .Values.networking.service.cupsNodePort }}
+    {{- end }}
+  - name: smb
+    port: {{ .Values.networking.service.smbPort }}
+    targetPort: smb
+    protocol: TCP
+    {{- if and (eq .Values.networking.service.type "NodePort") .Values.networking.service.smbNodePort }}
+    nodePort: {{ .Values.networking.service.smbNodePort }}
+    {{- end }}
+  - name: netbios
+    port: {{ .Values.networking.service.netbiosPort }}
+    targetPort: netbios
+    protocol: TCP
+    {{- if and (eq .Values.networking.service.type "NodePort") .Values.networking.service.netbiosNodePort }}
+    nodePort: {{ .Values.networking.service.netbiosNodePort }}
+    {{- end }}
+  - name: netbios-ns
+    port: 137
+    targetPort: netbios-ns
+    protocol: UDP
+  - name: netbios-dgm
+    port: 138
+    targetPort: netbios-dgm
+    protocol: UDP
+  - name: mdns
+    port: 5353
+    targetPort: mdns
+    protocol: UDP
+  selector:
+    {{- include "truenas-printserver.selectorLabels" . | nindent 4 }}
+{{- end }}
