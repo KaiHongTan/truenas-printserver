@@ -42,7 +42,7 @@ COPY cupsd.conf /usr/local/etc_config_template/cups/cupsd.conf
 COPY cups-pdf.conf /usr/local/etc_config_template/cups/cups-pdf.conf
 COPY smb.conf /usr/local/etc_config_template/samba/smb.conf
 COPY avahi-daemon.conf /usr/local/etc_config_template/avahi/avahi-daemon.conf
-COPY airprint.service /usr/local/etc_config_template/avahi/services/airprint.service # Make sure services dir is there
+COPY airprint.service /usr/local/etc_config_template/avahi/services/airprint.service
 COPY start.sh /start.sh
 COPY generate-airprint.sh /usr/local/bin/generate-airprint.sh
 RUN chmod +x /usr/local/bin/generate-airprint.sh
