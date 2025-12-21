@@ -1,0 +1,29 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="256" height="256" rx="32" fill="#2563eb"/>
+  
+  <!-- Printer body -->
+  <rect x="64" y="96" width="128" height="96" rx="8" fill="#ffffff"/>
+  
+  <!-- Paper tray -->
+  <rect x="80" y="72" width="96" height="32" rx="4" fill="#e5e7eb"/>
+  
+  <!-- Control panel -->
+  <rect x="72" y="104" width="112" height="24" rx="4" fill="#3b82f6"/>
+  
+  <!-- Buttons -->
+  <circle cx="96" cy="116" r="4" fill="#10b981"/>
+  <circle cx="112" cy="116" r="4" fill="#f59e0b"/>
+  <circle cx="128" cy="116" r="4" fill="#ef4444"/>
+  
+  <!-- Paper output -->
+  <rect x="80" y="184" width="96" height="8" rx="2" fill="#e5e7eb"/>
+  
+  <!-- Network symbol -->
+  <circle cx="200" cy="80" r="24" fill="#10b981"/>
+  <path d="M 200 68 L 200 92 M 188 80 L 212 80" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="188" cy="80" r="2" fill="#ffffff"/>
+  <circle cx="200" cy="68" r="2" fill="#ffffff"/>
+  <circle cx="212" cy="80" r="2" fill="#ffffff"/>
+  <circle cx="200" cy="92" r="2" fill="#ffffff"/>
+</svg>

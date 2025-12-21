@@ -1,0 +1,322 @@
+groups:
+  - name: "Container Images"
+    description: "Image configuration for the application"
+  - name: "Network Configuration"
+    description: "Configure network settings"
+  - name: "Storage Configuration"
+    description: "Configure persistent storage"
+  - name: "Environment Variables"
+    description: "Configure application environment"
+  - name: "USB Configuration"
+    description: "Configure USB printer access"
+  - name: "Resource Management"
+    description: "Configure resource limits"
+  - name: "Advanced Settings"
+    description: "Advanced configuration options"
+
+questions:
+  # Container Images
+  - variable: image
+    label: ""
+    group: "Container Images"
+    schema:
+      type: dict
+      attrs:
+        - variable: repository
+          label: "Image Repository"
+          description: "Docker image repository"
+          schema:
+            type: string
+            default: "ghcr.io/KaiHongTan/truenas-printserver"
+            required: true
+        - variable: tag
+          label: "Image Tag"
+          description: "Docker image tag"
+          schema:
+            type: string
+            default: "latest"
+            required: true
+        - variable: pullPolicy
+          label: "Image Pull Policy"
+          schema:
+            type: string
+            default: "IfNotPresent"
+            enum:
+              - value: "IfNotPresent"
+                description: "Only pull if not present"
+              - value: "Always"
+                description: "Always pull"
+              - value: "Never"
+                description: "Never pull"
+
+  # Network Configuration
+  - variable: networking
+    label: ""
+    group: "Network Configuration"
+    schema:
+      type: dict
+      attrs:
+        - variable: hostNetwork
+          label: "Use Host Network"
+          description: "Enable host networking for better printer discovery (RECOMMENDED)"
+          schema:
+            type: boolean
+            default: true
+        - variable: service
+          label: "Service Configuration"
+          description: "Only used if Host Network is disabled"
+          schema:
+            type: dict
+            show_if: [["hostNetwork", "=", false]]
+            attrs:
+              - variable: type
+                label: "Service Type"
+                schema:
+                  type: string
+                  default: "NodePort"
+                  enum:
+                    - value: "NodePort"
+                      description: "NodePort"
+                    - value: "LoadBalancer"
+                      description: "LoadBalancer (requires MetalLB)"
+              - variable: cupsNodePort
+                label: "CUPS Web Interface Port"
+                description: "NodePort for CUPS (default: 30631)"
+                schema:
+                  type: int
+                  default: 30631
+                  min: 30000
+                  max: 32767
+              - variable: smbNodePort
+                label: "Samba SMB Port"
+                description: "NodePort for SMB (default: 30445)"
+                schema:
+                  type: int
+                  default: 30445
+                  min: 30000
+                  max: 32767
+
+  # Storage Configuration
+  - variable: persistence
+    label: ""
+    group: "Storage Configuration"
+    schema:
+      type: dict
+      attrs:
+        - variable: config
+          label: "Configuration Storage"
+          description: "Stores CUPS configuration, printer settings, and drivers"
+          schema:
+            type: dict
+            attrs:
+              - variable: enabled
+                label: "Enable Configuration Storage"
+                schema:
+                  type: boolean
+                  default: true
+              - variable: size
+                label: "Storage Size"
+                schema:
+                  type: string
+                  show_if: [["enabled", "=", true]]
+                  default: "1Gi"
+                  required: true
+        - variable: spool
+          label: "Print Queue Storage"
+          description: "Stores print jobs and spool data"
+          schema:
+            type: dict
+            attrs:
+              - variable: enabled
+                label: "Enable Spool Storage"
+                schema:
+                  type: boolean
+                  default: true
+              - variable: size
+                label: "Storage Size"
+                schema:
+                  type: string
+                  show_if: [["enabled", "=", true]]
+                  default: "5Gi"
+                  required: true
+
+  # Environment Variables
+  - variable: env
+    label: ""
+    group: "Environment Variables"
+    schema:
+      type: dict
+      attrs:
+        - variable: TZ
+          label: "Timezone"
+          description: "Set timezone for logs and scheduling"
+          schema:
+            type: string
+            default: "UTC"
+            required: true
+            enum:
+              - value: "UTC"
+                description: "UTC"
+              - value: "America/New_York"
+                description: "America/New_York"
+              - value: "America/Chicago"
+                description: "America/Chicago"
+              - value: "America/Denver"
+                description: "America/Denver"
+              - value: "America/Los_Angeles"
+                description: "America/Los_Angeles"
+              - value: "Europe/London"
+                description: "Europe/London"
+              - value: "Europe/Paris"
+                description: "Europe/Paris"
+              - value: "Asia/Tokyo"
+                description: "Asia/Tokyo"
+              - value: "Asia/Shanghai"
+                description: "Asia/Shanghai"
+              - value: "Australia/Sydney"
+                description: "Australia/Sydney"
+        - variable: WORKGROUP
+          label: "Windows Workgroup"
+          description: "Windows workgroup name for SMB sharing"
+          schema:
+            type: string
+            default: "WORKGROUP"
+            required: true
+        - variable: SERVER_NAME
+          label: "Server Name"
+          description: "Display name for the print server"
+          schema:
+            type: string
+            default: "TrueNAS-Print"
+            required: true
+
+  # USB Configuration
+  - variable: usbDevices
+    label: ""
+    group: "USB Configuration"
+    schema:
+      type: dict
+      attrs:
+        - variable: enabled
+          label: "Enable USB Printer Support"
+          description: "Mount USB devices for printer access (REQUIRED)"
+          schema:
+            type: boolean
+            default: true
+        - variable: hostPath
+          label: "USB Device Host Path"
+          description: "Path to USB devices on host"
+          schema:
+            type: string
+            show_if: [["enabled", "=", true]]
+            default: "/dev/bus/usb"
+            required: true
+
+  # Resource Management
+  - variable: resources
+    label: ""
+    group: "Resource Management"
+    schema:
+      type: dict
+      attrs:
+        - variable: limits
+          label: "Resource Limits"
+          schema:
+            type: dict
+            attrs:
+              - variable: cpu
+                label: "CPU Limit"
+                description: "Maximum CPU (in millicores, e.g., 1000m = 1 CPU)"
+                schema:
+                  type: string
+                  default: "1000m"
+              - variable: memory
+                label: "Memory Limit"
+                description: "Maximum memory (e.g., 512Mi, 1Gi)"
+                schema:
+                  type: string
+                  default: "512Mi"
+        - variable: requests
+          label: "Resource Requests"
+          schema:
+            type: dict
+            attrs:
+              - variable: cpu
+                label: "CPU Request"
+                description: "Minimum CPU guaranteed"
+                schema:
+                  type: string
+                  default: "100m"
+              - variable: memory
+                label: "Memory Request"
+                description: "Minimum memory guaranteed"
+                schema:
+                  type: string
+                  default: "128Mi"
+
+  # Advanced Settings
+  - variable: advanced
+    label: ""
+    group: "Advanced Settings"
+    schema:
+      type: dict
+      attrs:
+        - variable: cups
+          label: "CUPS Settings"
+          schema:
+            type: dict
+            attrs:
+              - variable: maxJobs
+                label: "Maximum Print Jobs"
+                description: "Maximum number of concurrent print jobs"
+                schema:
+                  type: int
+                  default: 500
+              - variable: logLevel
+                label: "Log Level"
+                schema:
+                  type: string
+                  default: "warn"
+                  enum:
+                    - value: "debug"
+                      description: "Debug"
+                    - value: "info"
+                      description: "Info"
+                    - value: "warn"
+                      description: "Warning"
+                    - value: "error"
+                      description: "Error"
+        - variable: samba
+          label: "Samba Settings"
+          schema:
+            type: dict
+            attrs:
+              - variable: guestAccess
+                label: "Enable Guest Access"
+                description: "Allow printing without authentication"
+                schema:
+                  type: boolean
+                  default: true
+              - variable: winsSupport
+                label: "Enable WINS Support"
+                description: "Enable WINS server for Windows network browsing"
+                schema:
+                  type: boolean
+                  default: true
+        - variable: avahi
+          label: "Avahi/mDNS Settings"
+          schema:
+            type: dict
+            attrs:
+              - variable: ipv6
+                label: "Enable IPv6"
+                description: "Enable IPv6 support for mDNS"
+                schema:
+                  type: boolean
+                  default: true
+              - variable: hostname
+                label: "mDNS Hostname"
+                description: "Hostname for mDNS discovery (will be hostname.local)"
+                schema:
+                  type: string
+                  default: "truenas-print"

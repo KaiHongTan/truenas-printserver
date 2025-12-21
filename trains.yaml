@@ -1,0 +1,24 @@
+charts:
+  truenas-printserver:
+    app_readme: https://raw.githubusercontent.com/KaiHongTan/truenas-printserver/main/charts/truenas-printserver/app-readme.md
+    categories:
+      - networking
+      - media
+    description: All-in-one network print server with CUPS, Samba, and Avahi for maximum cross-platform compatibility
+    healthy: true
+    healthy_error: null
+    home: https://github.com/KaiHongTan/truenas-printserver
+    location: charts/truenas-printserver
+    latest_version: 1.0.0
+    latest_app_version: 1.0.0
+    latest_human_version: 1.0.0
+    last_update: "2024-01-01 00:00:00"
+    name: truenas-printserver
+    recommended: false
+    title: TrueNAS Print Server
+    maintainers:
+      - name: Your Name
+        email: your.email@example.com
+    sources:
+      - https://github.com/KaiHongTan/truenas-printserver
+    icon_url: https://raw.githubusercontent.com/KaiHongTan/truenas-printserver/main/icon.svg
