@@ -37,6 +37,8 @@ COPY smb.conf /etc/samba/smb.conf
 COPY avahi-daemon.conf /etc/avahi/avahi-daemon.conf
 COPY airprint.service /etc/avahi/services/airprint.service
 COPY start.sh /start.sh
+COPY generate-airprint.sh /usr/local/bin/generate-airprint.sh
+RUN chmod +x /usr/local/bin/generate-airprint.sh
 
 # Make start script executable
 RUN chmod +x /start.sh

@@ -75,6 +75,10 @@ echo "Configuring CUPS..."
 cupsctl --remote-admin --remote-any --share-printers 2>/dev/null || true
 cupsctl BrowseLocalProtocols=dnssd 2>/dev/null || true
 
+# Generate initial AirPrint services
+echo "Generating AirPrint services..."
+/usr/local/bin/generate-airprint.sh
+
 echo "=========================================="
 echo "Print Server Started Successfully!"
 echo "=========================================="
@@ -95,6 +99,7 @@ echo "Press Ctrl+C to stop all services"
 echo "=========================================="
 
 # Monitor processes and restart if needed
+LAST_PRINTER_COUNT=0
 while true; do
     # Check if CUPS is still running
     if ! kill -0 $CUPSD_PID 2>/dev/null; then
@@ -114,6 +119,14 @@ while true; do
         echo "ERROR: Samba NMB died, restarting..."
         nmbd --foreground --no-process-group &
         NMBD_PID=$!
+    fi
+    
+    # Check if printer count changed (new printer added/removed)
+    CURRENT_PRINTER_COUNT=$(lpstat -p 2>/dev/null | wc -l)
+    if [ "$CURRENT_PRINTER_COUNT" != "$LAST_PRINTER_COUNT" ]; then
+        echo "Printer count changed, regenerating AirPrint services..."
+        /usr/local/bin/generate-airprint.sh
+        LAST_PRINTER_COUNT=$CURRENT_PRINTER_COUNT
     fi
     
     sleep 10
