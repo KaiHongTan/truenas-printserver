@@ -5,6 +5,43 @@ echo "=========================================="
 echo "Starting TrueNAS Print Server"
 echo "=========================================="
 
+# --- Volume Initialization (ADD THESE LINES) ---
+# Define a temporary location for original config files from Dockerfile
+INITIAL_CONFIG_DIR="/usr/local/etc_config_template" # This will be created in Dockerfile
+PERSISTENT_AVAHI_DIR="/config/avahi" # Your mounted volume for avahi
+PERSISTENT_CUPS_DIR="/config/cups"   # Your mounted volume for cups
+PERSISTENT_SAMBA_DIR="/config/samba" # Your mounted volume for samba
+
+# Check and copy Avahi config if the persistent volume is empty
+if [ ! -f "${PERSISTENT_AVAHI_DIR}/avahi-daemon.conf" ]; then
+    echo "Initializing Avahi config in persistent volume..."
+    cp "${INITIAL_CONFIG_DIR}/avahi/avahi-daemon.conf" "${PERSISTENT_AVAHI_DIR}/"
+    cp "${INITIAL_CONFIG_DIR}/avahi/services/airprint.service" "${PERSISTENT_AVAHI_DIR}/services/" # Assuming 'services' sub-directory
+fi
+# Link the actual config directory to the persistent one
+rm -rf /etc/avahi
+ln -s "${PERSISTENT_AVAHI_DIR}" /etc/avahi
+
+# Check and copy CUPS config if the persistent volume is empty
+if [ ! -f "${PERSISTENT_CUPS_DIR}/cupsd.conf" ]; then
+    echo "Initializing CUPS config in persistent volume..."
+    cp "${INITIAL_CONFIG_DIR}/cups/cupsd.conf" "${PERSISTENT_CUPS_DIR}/"
+    cp "${INITIAL_CONFIG_DIR}/cups/cups-pdf.conf" "${PERSISTENT_CUPS_DIR}/"
+fi
+# Link the actual config directory to the persistent one
+rm -rf /etc/cups
+ln -s "${PERSISTENT_CUPS_DIR}" /etc/cups
+
+
+# Check and copy Samba config if the persistent volume is empty
+if [ ! -f "${PERSISTENT_SAMBA_DIR}/smb.conf" ]; then
+    echo "Initializing Samba config in persistent volume..."
+    cp "${INITIAL_CONFIG_DIR}/samba/smb.conf" "${PERSISTENT_SAMBA_DIR}/"
+fi
+# Link the actual config directory to the persistent one
+rm -rf /etc/samba
+ln -s "${PERSISTENT_SAMBA_DIR}" /etc/samba
+
 # Function to handle shutdown
 shutdown_handler() {
     echo "Shutting down services..."

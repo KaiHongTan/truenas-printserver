@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -y \
     libnss-mdns \
     inotify-tools \
     sudo \
+    dbus \
     && rm -rf /var/lib/apt/lists/*
 
 # Create necessary directories
@@ -28,14 +29,20 @@ RUN mkdir -p /var/spool/samba \
     && mkdir -p /var/lib/samba/printers \
     && mkdir -p /config/cups \
     && mkdir -p /config/samba \
-    && mkdir -p /config/avahi
+    && mkdir -p /config/avahi \
+    && mkdir -p /config/avahi/services # Ensure this exists for airprint.service
+    # Add the directory for initial config templates
+    && mkdir -p /usr/local/etc_config_template/cups \
+    && mkdir -p /usr/local/etc_config_template/samba \
+    && mkdir -p /usr/local/etc_config_template/avahi/services
 
-# Copy configuration files
-COPY cupsd.conf /etc/cups/cupsd.conf
-COPY cups-pdf.conf /etc/cups/cups-pdf.conf
-COPY smb.conf /etc/samba/smb.conf
-COPY avahi-daemon.conf /etc/avahi/avahi-daemon.conf
-COPY airprint.service /etc/avahi/services/airprint.service
+
+# Copy configuration files to a *temporary location* for initialization
+COPY cupsd.conf /usr/local/etc_config_template/cups/cupsd.conf
+COPY cups-pdf.conf /usr/local/etc_config_template/cups/cups-pdf.conf
+COPY smb.conf /usr/local/etc_config_template/samba/smb.conf
+COPY avahi-daemon.conf /usr/local/etc_config_template/avahi/avahi-daemon.conf
+COPY airprint.service /usr/local/etc_config_template/avahi/services/airprint.service # Make sure services dir is there
 COPY start.sh /start.sh
 COPY generate-airprint.sh /usr/local/bin/generate-airprint.sh
 RUN chmod +x /usr/local/bin/generate-airprint.sh
