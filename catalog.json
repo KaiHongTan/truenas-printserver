@@ -1,7 +1,42 @@
 {
-  "trains": {
-    "charts": {
-      "description": "Main application catalog"
+  "charts": {
+    "truenas-printserver": {
+      "name": "truenas-printserver",
+      "title": "TrueNAS Print Server",
+      "description": "Network print server with CUPS, Samba, and Avahi for maximum cross-platform compatibility",
+      "app_readme": "<h1>TrueNAS Print Server</h1><p>Network print server with CUPS, Samba, and Avahi for maximum cross-platform compatibility.</p><p>Features:</p><ul><li>CUPS print server for network printing</li><li>Samba for Windows printer sharing</li><li>Avahi/mDNS for AirPrint support</li><li>Web-based administration interface</li></ul>",
+      "categories": [
+        "networking",
+        "media"
+      ],
+      "home": "https://github.com/KaiHongTan/truenas-printserver",
+      "location": "trains/charts/truenas-printserver",
+      "healthy": true,
+      "healthy_error": null,
+      "latest_version": "1.0.0",
+      "latest_app_version": "1.0.0",
+      "latest_human_version": "1.0.0_1.0.0",
+      "last_update": "2024-12-21 00:00:00",
+      "recommended": false,
+      "maintainers": [
+        {
+          "name": "Kai Hong Tan",
+          "email": "kaihong011108@gmail.com",
+          "url": "https://github.com/KaiHongTan"
+        }
+      ],
+      "tags": [
+        "printer",
+        "cups",
+        "samba",
+        "airprint",
+        "network"
+      ],
+      "screenshots": [],
+      "sources": [
+        "https://github.com/KaiHongTan/truenas-printserver"
+      ],
+      "icon_url": "https://raw.githubusercontent.com/KaiHongTan/truenas-printserver/main/icon.svg"
     }
   }
 }
