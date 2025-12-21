@@ -26,17 +26,24 @@ ln -s "${PERSISTENT_AVAHI_DIR}" /etc/avahi
 # Check and copy CUPS config if the persistent volume is empty
 if [ ! -f "${PERSISTENT_CUPS_DIR}/cupsd.conf" ]; then
     echo "Initializing CUPS config in persistent volume..."
-    mkdir -p "${PERSISTENT_CUPS_DIR}/certs" # <--- ADD THIS LINE (if not there already)
     cp "${INITIAL_CONFIG_DIR}/cups/cupsd.conf" "${PERSISTENT_CUPS_DIR}/"
     cp "${INITIAL_CONFIG_DIR}/cups/cups-pdf.conf" "${PERSISTENT_CUPS_DIR}/"
-
-    # Ensure correct permissions for the certs directory (CUPS often runs as 'lp' user)
-    # The 'lp' user and group usually handle CUPS daemon processes.
-    # You might need to verify the exact group for 'lp' on debian:bookworm-slim.
-    # On many systems, the user and group are both 'lp'.
-    chown -R lp:lp "${PERSISTENT_CUPS_DIR}/certs"
-    chmod 700 "${PERSISTENT_CUPS_DIR}/certs"
 fi
+
+# --- FIX START ---
+# Ensure SSL directory exists and has correct permissions (Run this EVERY time)
+# Debian uses 'ssl', not 'certs'
+if [ ! -d "${PERSISTENT_CUPS_DIR}/ssl" ]; then
+    echo "Creating CUPS SSL directory..."
+    mkdir -p "${PERSISTENT_CUPS_DIR}/ssl"
+fi
+
+# Force permissions on the ssl directory so 'lp' user can write keys there
+echo "Setting permissions for CUPS SSL directory..."
+chown -R lp:lp "${PERSISTENT_CUPS_DIR}/ssl"
+chmod 700 "${PERSISTENT_CUPS_DIR}/ssl"
+# --- FIX END ---
+
 # Link the actual config directory to the persistent one
 rm -rf /etc/cups
 ln -s "${PERSISTENT_CUPS_DIR}" /etc/cups
