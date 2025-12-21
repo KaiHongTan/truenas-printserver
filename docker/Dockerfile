@@ -30,7 +30,7 @@ RUN mkdir -p /var/spool/samba \
     && mkdir -p /config/cups \
     && mkdir -p /config/samba \
     && mkdir -p /config/avahi \
-    && mkdir -p /config/avahi/services # Ensure this exists for airprint.service
+    && mkdir -p /config/avahi/services \
     # Add the directory for initial config templates
     && mkdir -p /usr/local/etc_config_template/cups \
     && mkdir -p /usr/local/etc_config_template/samba \
