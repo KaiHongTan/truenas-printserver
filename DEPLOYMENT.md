@@ -18,10 +18,9 @@ Complete guide for deploying the TrueNAS Print Server from GitHub.
 - Repository will be public (required for free GitHub Container Registry)
 
 ### TrueNAS Scale
-- TrueNAS Scale 24.04 (Dragonfish) or later
-- Apps feature enabled
-- At least 2GB RAM available for apps
-- USB printer connected to the server
+- **24.10 (Electric Eel), 25.x, or newer:** Apps use Docker, not the Helm catalog in this repo. Install the container via **Custom App** or **Install via YAML** — see the main [README.md](README.md) and [deploy/truenas-scale-25-compose.yaml](deploy/truenas-scale-25-compose.yaml).
+- **24.04 (Dragonfish) or earlier:** legacy k3s/Helm catalog flow described in this document may still apply.
+- Apps feature enabled; at least ~2GB RAM free for the app workload; USB printer if you use USB passthrough
 
 ## GitHub Setup
 

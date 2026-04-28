@@ -1,6 +1,17 @@
 # TrueNAS Scale Catalog Structure
 
-This document explains the catalog structure required by TrueNAS Scale.
+## TrueNAS Scale 24.10+ (Docker Apps)
+
+**Custom catalogs in this repository target legacy TrueNAS Scale** releases that installed Apps with **Helm + Kubernetes (k3s)**. From **Electric Eel (24.10)** onward, the official platform uses **Docker Compose** and the **[truenas/apps](https://github.com/truenas/apps)** catalog format — not the Kubernetes templates described below.
+
+- **Installing on 24.10 / 25.x:** use the **Custom App** wizard or **Install via YAML** as documented in the main [README.md](README.md) and [`deploy/truenas-scale-25-compose.yaml`](deploy/truenas-scale-25-compose.yaml).
+- **Optional future work:** a full port to `truenas/apps`-style packaging (`templates/docker-compose.yaml` + `ix_lib`) would restore one-click **Discover Apps** installs for modern Scale; that is not what this file describes.
+
+---
+
+## Legacy: Kubernetes-era catalog layout
+
+This document explains the catalog structure used for **pre–24.10** TrueNAS Scale Helm Apps.
 
 ## Directory Structure
 
@@ -217,5 +228,6 @@ helm install test trains/charts/truenas-printserver/1.0.0/
 ## Resources
 
 - TrueNAS Scale Documentation: https://www.truenas.com/docs/scale/
-- TrueNAS Community Catalog: https://github.com/truenas/charts
+- Modern Apps catalog (24.10+): https://github.com/truenas/apps
+- Deprecated Kubernetes-era catalog: https://github.com/truenas/charts
 - Helm Documentation: https://helm.sh/docs/

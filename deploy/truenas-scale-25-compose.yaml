@@ -1,0 +1,58 @@
+# Reference Docker Compose for TrueNAS Scale 24.10+ (Electric Eel, Fangtooth, etc.)
+# Use with Apps → Discover Apps → Custom App → "Install via YAML" (after selecting an apps pool).
+#
+# BEFORE APPLYING:
+# 1. Replace every HOST path below with real datasets/paths on your NAS (ixVolumes appear under
+#    your apps pool, e.g. under /mnt/<pool>/.ix-apps/... — use the UI to create mounts and copy paths).
+# 2. Or switch Storage in the UI to ixVolume per mount after pasting; this file is a template.
+# 3. Host networking is strongly recommended for mDNS/AirPrint/SMB discovery (matches the legacy chart default).
+# 4. TrueNAS runs Avahi on the host. AVAHI_PUBLISH_MODE=host writes AirPrint .service files into the host's
+#    /etc/avahi/services (bind-mounted below) so you do not run a second Avahi in the container on UDP 5353.
+
+version: "3.8"
+
+services:
+  printserver:
+    container_name: truenas-printserver
+    image: ghcr.io/KaiHongTan/truenas-printserver:latest
+    restart: unless-stopped
+    network_mode: host
+    privileged: true
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+      - NET_BIND_SERVICE
+      - SYS_ADMIN
+    environment:
+      TZ: UTC
+      WORKGROUP: WORKGROUP
+      SERVER_NAME: TrueNAS-Print
+      CUPS_MAX_JOBS: "500"
+      CUPS_LOG_LEVEL: warn
+      SAMBA_GUEST_ACCESS: "true"
+      SAMBA_WINS_SUPPORT: "true"
+      AVAHI_IPV6: "true"
+      AVAHI_HOSTNAME: truenas-print
+      AVAHI_DOMAIN: local
+      # Recommended on TrueNAS: publish AirPrint via host Avahi. For container-only Avahi, set
+      # AVAHI_PUBLISH_MODE: container and remove the /airprint/avahi-services mount; add /config/avahi if needed.
+      AVAHI_PUBLISH_MODE: host
+      AIRPRINT_SERVICES_DIR: /airprint/avahi-services
+    volumes:
+      # start.sh symlinks /etc/cups and /etc/samba to /config/* — mount persistence there.
+      - /CHANGE_ME/printserver-config/cups:/config/cups
+      - /CHANGE_ME/printserver-config/samba:/config/samba
+      # Host path (left) is TrueNAS /etc/avahi/services — AirPrint definitions appear here for host Avahi.
+      - /etc/avahi/services:/airprint/avahi-services
+      # Spool
+      - /CHANGE_ME/printserver-spool/cups:/var/spool/cups
+      - /CHANGE_ME/printserver-spool/samba:/var/spool/samba
+      - /CHANGE_ME/printserver-spool/cups-pdf:/var/spool/cups-pdf
+      # USB printers (omit if not using USB)
+      - /dev/bus/usb:/dev/bus/usb
+    healthcheck:
+      test: ["CMD", "/bin/bash", "-c", "lpstat -r"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s

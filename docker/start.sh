@@ -5,6 +5,9 @@ echo "=========================================="
 echo "Starting TrueNAS Print Server"
 echo "=========================================="
 
+AVAHI_PUBLISH_MODE="${AVAHI_PUBLISH_MODE:-container}"
+export AVAHI_PUBLISH_MODE
+
 # --- Volume Initialization (ADD THESE LINES) ---
 # Define a temporary location for original config files from Dockerfile
 INITIAL_CONFIG_DIR="/usr/local/etc_config_template" # This will be created in Dockerfile
@@ -12,16 +15,27 @@ PERSISTENT_AVAHI_DIR="/config/avahi" # Your mounted volume for avahi
 PERSISTENT_CUPS_DIR="/config/cups"   # Your mounted volume for cups
 PERSISTENT_SAMBA_DIR="/config/samba" # Your mounted volume for samba
 
-# Check and copy Avahi config if the persistent volume is empty
-if [ ! -f "${PERSISTENT_AVAHI_DIR}/avahi-daemon.conf" ]; then
-    echo "Initializing Avahi config in persistent volume..."
-    mkdir -p "${PERSISTENT_AVAHI_DIR}/services"
-    cp "${INITIAL_CONFIG_DIR}/avahi/avahi-daemon.conf" "${PERSISTENT_AVAHI_DIR}/"
-    cp "${INITIAL_CONFIG_DIR}/avahi/services/airprint.service" "${PERSISTENT_AVAHI_DIR}/services/" # Assuming 'services' sub-directory
+if [ "$AVAHI_PUBLISH_MODE" = "host" ]; then
+    # TrueNAS (and some NAS distros) already run avahi-daemon on the host. With host networking,
+    # a second Avahi in the container fights for UDP 5353. Publish AirPrint .service files to the
+    # host directory instead (bind-mount host /etc/avahi/services -> AIRPRINT_SERVICES_DIR).
+    AIRPRINT_SERVICES_DIR="${AIRPRINT_SERVICES_DIR:-/airprint/avahi-services}"
+    export AIRPRINT_SERVICES_DIR
+    mkdir -p "$AIRPRINT_SERVICES_DIR"
+    echo "Avahi publish mode: host — AirPrint services will be written to ${AIRPRINT_SERVICES_DIR}"
+    echo "(Mount the NAS host's /etc/avahi/services to this path read-write.)"
+else
+    # Check and copy Avahi config if the persistent volume is empty
+    if [ ! -f "${PERSISTENT_AVAHI_DIR}/avahi-daemon.conf" ]; then
+        echo "Initializing Avahi config in persistent volume..."
+        mkdir -p "${PERSISTENT_AVAHI_DIR}/services"
+        cp "${INITIAL_CONFIG_DIR}/avahi/avahi-daemon.conf" "${PERSISTENT_AVAHI_DIR}/"
+        cp "${INITIAL_CONFIG_DIR}/avahi/services/airprint.service" "${PERSISTENT_AVAHI_DIR}/services/" # Assuming 'services' sub-directory
+    fi
+    # Link the actual config directory to the persistent one
+    rm -rf /etc/avahi
+    ln -s "${PERSISTENT_AVAHI_DIR}" /etc/avahi
 fi
-# Link the actual config directory to the persistent one
-rm -rf /etc/avahi
-ln -s "${PERSISTENT_AVAHI_DIR}" /etc/avahi
 
 # Check and copy CUPS config if the persistent volume is empty
 if [ ! -f "${PERSISTENT_CUPS_DIR}/cupsd.conf" ]; then
@@ -88,7 +102,7 @@ chmod 1777 /var/spool/samba
 chmod 755 /var/lib/samba/printers
 chmod 1777 /var/spool/cups-pdf
 
-# Start D-Bus (required for Avahi)
+# Start D-Bus (required for Avahi in container mode; CUPS may use it for some features)
 echo "Starting D-Bus..."
 rm -f /var/run/dbus/pid
 dbus-daemon --system --fork || true
@@ -96,14 +110,17 @@ dbus-daemon --system --fork || true
 # Wait a moment for D-Bus to start
 sleep 2
 
-# Start Avahi daemon
-echo "Starting Avahi daemon..."
-avahi-daemon --daemonize --no-chroot || {
-    echo "Warning: Avahi failed to start, continuing anyway..."
-}
-
-# Wait for Avahi to initialize
-sleep 2
+if [ "$AVAHI_PUBLISH_MODE" = "host" ]; then
+    echo "Skipping in-container Avahi (using host Avahi for mDNS/AirPrint)."
+else
+    # Start Avahi daemon
+    echo "Starting Avahi daemon..."
+    avahi-daemon --daemonize --no-chroot || {
+        echo "Warning: Avahi failed to start, continuing anyway..."
+    }
+    # Wait for Avahi to initialize
+    sleep 2
+fi
 
 # Start Samba
 echo "Starting Samba services..."
@@ -148,7 +165,11 @@ echo "Services running:"
 echo "- CUPS (PID: $CUPSD_PID)"
 echo "- Samba SMB (PID: $SMBD_PID)"
 echo "- Samba NMB (PID: $NMBD_PID)"
-echo "- Avahi mDNS"
+if [ "$AVAHI_PUBLISH_MODE" = "host" ]; then
+    echo "- AirPrint/mDNS: host Avahi (services in ${AIRPRINT_SERVICES_DIR})"
+else
+    echo "- Avahi mDNS (in container)"
+fi
 echo ""
 echo "Connect your USB printer and configure it at:"
 echo "http://[SERVER_IP]:631/admin"

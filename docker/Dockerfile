@@ -1,6 +1,8 @@
 FROM debian:bookworm-slim
 
 # Set environment variables
+# AVAHI_PUBLISH_MODE=host uses host Avahi; bind-mount host /etc/avahi/services to AIRPRINT_SERVICES_DIR (default /airprint/avahi-services).
+# Optional: AVAHI_HUP_CMD to reload host Avahi after service file updates.
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install all required packages
