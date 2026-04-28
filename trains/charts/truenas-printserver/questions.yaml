@@ -27,7 +27,7 @@ questions:
           description: "Docker image repository"
           schema:
             type: string
-            default: "ghcr.io/KaiHongTan/truenas-printserver"
+            default: "ghcr.io/kaihongtan/truenas-printserver"
             required: true
         - variable: tag
           label: "Image Tag"

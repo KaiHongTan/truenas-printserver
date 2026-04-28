@@ -131,7 +131,7 @@ questions:
 ```yaml
 # TrueNAS-specific value overrides
 image:
-  repository: ghcr.io/KaiHongTan/truenas-printserver
+  repository: ghcr.io/kaihongtan/truenas-printserver
   tag: latest
 ```
 **Purpose**: Default values specifically for TrueNAS installations.

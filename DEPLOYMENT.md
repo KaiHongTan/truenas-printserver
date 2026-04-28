@@ -94,7 +94,7 @@ Complete guide for deploying the TrueNAS Print Server from GitHub.
 - Enter: `printserver` (or any name you prefer)
 
 **Container Images:**
-- Repository: `ghcr.io/KaiHongTan/truenas-printserver`
+- Repository: `ghcr.io/kaihongtan/truenas-printserver`
 - Tag: `latest`
 - Pull Policy: `IfNotPresent`
 
@@ -160,7 +160,7 @@ helm install printserver truenas-printserver/truenas-printserver \
 helm install printserver truenas-printserver/truenas-printserver \
   --namespace ix-printserver \
   --create-namespace \
-  --set image.repository=ghcr.io/KaiHongTan/truenas-printserver \
+  --set image.repository=ghcr.io/kaihongtan/truenas-printserver \
   --set networking.hostNetwork=true \
   --set env.TZ=America/New_York
 ```

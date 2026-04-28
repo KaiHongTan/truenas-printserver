@@ -14,7 +14,7 @@ version: "3.8"
 services:
   printserver:
     container_name: truenas-printserver
-    image: ghcr.io/KaiHongTan/truenas-printserver:latest
+    image: ghcr.io/kaihongtan/truenas-printserver:latest
     restart: unless-stopped
     network_mode: host
     privileged: true

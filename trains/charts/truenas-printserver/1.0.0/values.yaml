@@ -2,7 +2,7 @@
 # This configuration is optimized for TrueNAS Scale deployment
 
 image:
-  repository: ghcr.io/KaiHongTan/truenas-printserver
+  repository: ghcr.io/kaihongtan/truenas-printserver
   tag: latest
   pullPolicy: IfNotPresent
 

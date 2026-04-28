@@ -15,6 +15,13 @@ chmod 755 "${AVAHI_DIR}" 2>/dev/null || true
 
 CUPS_PRINTERS=$(lpstat -p 2>/dev/null | awk '{print $2}' || true)
 
+# AirPrint / iOS: URF=none and pdl without image/urf cause many iPhones to ignore the queue.
+# Override per deployment if a queue lies about capabilities (e.g. monochrome label printer: set F,F).
+AIRPRINT_PDL="${AIRPRINT_PDL:-application/pdf,image/jpeg,image/png,image/urf,application/octet-stream,application/postscript}"
+AIRPRINT_URF="${AIRPRINT_URF:-W8,SRGB24,CP255,FN3}"
+AIRPRINT_COLOR="${AIRPRINT_COLOR:-T}"
+AIRPRINT_DUPLEX="${AIRPRINT_DUPLEX:-T}"
+
 # Remove old AirPrint services (except our template if present elsewhere)
 rm -f "${AVAHI_DIR}"/AirPrint-*.service
 
@@ -25,6 +32,7 @@ for printer in $CUPS_PRINTERS; do
 
     # Use printer name if no description
     [ -z "$PRINTER_INFO" ] && PRINTER_INFO="$printer"
+    [ -z "$PRINTER_LOCATION" ] && PRINTER_LOCATION="${PRINTER_INFO}"
 
     # Create service file
     cat > "${AVAHI_DIR}/AirPrint-${printer}.service" <<EOF
@@ -42,11 +50,10 @@ for printer in $CUPS_PRINTERS; do
     <txt-record>ty=${PRINTER_INFO}</txt-record>
     <txt-record>adminurl=http://%h:631/</txt-record>
     <txt-record>note=${PRINTER_LOCATION}</txt-record>
-    <txt-record>pdl=application/pdf,image/jpeg,image/png,application/postscript</txt-record>
-    <txt-record>Transparent=T</txt-record>
-    <txt-record>URF=none</txt-record>
-    <txt-record>Color=T</txt-record>
-    <txt-record>Duplex=T</txt-record>
+    <txt-record>pdl=${AIRPRINT_PDL}</txt-record>
+    <txt-record>URF=${AIRPRINT_URF}</txt-record>
+    <txt-record>Color=${AIRPRINT_COLOR}</txt-record>
+    <txt-record>Duplex=${AIRPRINT_DUPLEX}</txt-record>
     <txt-record>Copies=T</txt-record>
   </service>
 </service-group>

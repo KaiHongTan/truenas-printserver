@@ -156,14 +156,14 @@ kubectl exec -n ix-printserver [POD-NAME] -- tail -f /var/log/cups/error_log
 
 ### GitHub Container Registry
 ```
-ghcr.io/KaiHongTan/truenas-printserver:latest
-ghcr.io/KaiHongTan/truenas-printserver:main
-ghcr.io/KaiHongTan/truenas-printserver:v1.0.0
+ghcr.io/kaihongtan/truenas-printserver:latest
+ghcr.io/kaihongtan/truenas-printserver:main
+ghcr.io/kaihongtan/truenas-printserver:v1.0.0
 ```
 
 ### Pull Image Manually
 ```bash
-docker pull ghcr.io/KaiHongTan/truenas-printserver:latest
+docker pull ghcr.io/kaihongtan/truenas-printserver:latest
 ```
 
 ## Configuration Files

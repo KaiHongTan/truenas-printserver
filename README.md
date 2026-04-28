@@ -29,7 +29,7 @@ Choose one method. **Host networking** is recommended (same default as the legac
 1. Set an **apps pool** if prompted: **Apps** → choose pool for applications.
 2. **Apps** → **Discover Apps** → **Custom App** (Install iX App).
 3. **Application name**: e.g. `truenas-printserver` (lowercase, DNS-safe).
-4. **Image**: Repository `ghcr.io/KaiHongTan/truenas-printserver`, tag `latest` (or pin a tag), pull policy as you prefer.
+4. **Image**: Repository `ghcr.io/kaihongtan/truenas-printserver`, tag `latest` (or pin a tag), pull policy as you prefer. (Docker requires a **lowercase** `ghcr.io/user/repo` path; GitHub repo URLs may still be mixed case.)
 5. **Network**: Enable **Host network**.
 6. **Security**: Enable **Privileged**. Under **Capabilities**, add: `NET_ADMIN`, `NET_RAW`, `NET_BIND_SERVICE`, `SYS_ADMIN`.
 7. **Environment variables** (add each name/value):
@@ -147,6 +147,10 @@ Without host network you must **publish ports** (631 TCP, 445/139 TCP, 137–138
 On the NAS (SSH): `lsusb`. In the app **Shell** (Apps → your app): `lsusb` and `lpinfo -v`. Ensure `/dev/bus/usb` is mounted and **Privileged** is on.
 
 ### AirPrint / Bonjour does not show the printer
+
+**iPhone vs Mac:** iOS expects **`image/urf`** in the `pdl` TXT record and a real **`URF=...`** feature string — **`URF=none`** (older images) makes many iPhones skip the printer. Rebuild/pull the latest image, regenerate services, then **`killall -HUP avahi-daemon`** on the host.
+
+For **monochrome / label-only** queues, if iOS still misbehaves, set env on the app (optional overrides for `generate-airprint.sh`): **`AIRPRINT_COLOR=F`**, **`AIRPRINT_DUPLEX=F`**. Advanced: **`AIRPRINT_PDL`**, **`AIRPRINT_URF`** if you tune per site.
 
 When using **`AVAHI_PUBLISH_MODE=host`**, confirm **`AirPrint-*.service`** files exist on the NAS under **`/etc/avahi/services`**, then reload host Avahi (SSH on TrueNAS as root):
 
