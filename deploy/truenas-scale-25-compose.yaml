@@ -38,6 +38,11 @@ services:
       # AVAHI_PUBLISH_MODE: container and remove the /airprint/avahi-services mount; add /config/avahi if needed.
       AVAHI_PUBLISH_MODE: host
       AIRPRINT_SERVICES_DIR: /airprint/avahi-services
+      # Optional: serve the CUPS web UI with your own certificate instead of a self-signed one
+      # (uncomment together with the /certs mount below).
+      # CUPS_SSL_CERT: /certs/mycert.crt
+      # CUPS_SSL_KEY: /certs/mycert.key
+      # CUPS_SSL_HOSTNAME: nas.example.com
     volumes:
       # start.sh symlinks /etc/cups and /etc/samba to /config/* — mount persistence there.
       - /CHANGE_ME/printserver-config/cups:/config/cups
@@ -48,6 +53,8 @@ services:
       - /CHANGE_ME/printserver-spool/cups:/var/spool/cups
       - /CHANGE_ME/printserver-spool/samba:/var/spool/samba
       - /CHANGE_ME/printserver-spool/cups-pdf:/var/spool/cups-pdf
+      # Optional: certificates for CUPS_SSL_* (TrueNAS keeps its certificates in /etc/certificates)
+      # - /etc/certificates:/certs:ro
       # USB printers (omit if not using USB)
       - /dev/bus/usb:/dev/bus/usb
     healthcheck:
