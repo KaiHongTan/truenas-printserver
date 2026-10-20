@@ -133,7 +133,9 @@ Without host network you must **publish ports** (631 TCP, 445/139 TCP, 137–138
 2. **Administration** → **Add Printer** → choose the printer (e.g. USB)
 3. Enable **Share This Printer**, pick a driver, save
 
-Bundled drivers: Gutenprint, HPLIP/hpcups, and [brlaser](https://github.com/pdewacht/brlaser) (Brother monochrome lasers), plus driverless IPP Everywhere for modern network printers.
+When CUPS asks for a login, use **`cups-admin`** / **`admin`**. To use your own password, set **`CUPS_ADMIN_PASSWORD`** on the app and restart it.
+
+Bundled drivers: Gutenprint, HPLIP/hpcups, [brlaser](https://github.com/pdewacht/brlaser) (Brother monochrome lasers) and the OpenPrinting Foomatic database with Debian's extra printer drivers (Samsung, Epson, Oki, Fuji Xerox, Brother P-touch, Dymo and more), plus driverless IPP Everywhere for modern network printers.
 
 ### Use your own HTTPS certificate (optional)
 

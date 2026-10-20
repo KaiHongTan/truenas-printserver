@@ -129,6 +129,14 @@ chmod 1777 /var/spool/samba
 chmod 755 /var/lib/samba/printers
 chmod 1777 /var/spool/cups-pdf
 
+# Optional: replace the default CUPS admin password (cups-admin / admin). Applied on every
+# start because the container's /etc/shadow is reset whenever the app is redeployed.
+if [ -n "${CUPS_ADMIN_PASSWORD:-}" ]; then
+    echo "Setting CUPS admin password from CUPS_ADMIN_PASSWORD..."
+    printf 'cups-admin:%s\n' "${CUPS_ADMIN_PASSWORD}" | chpasswd \
+        || echo "Warning: failed to set the CUPS admin password; the default is still active."
+fi
+
 # Start D-Bus (required for Avahi in container mode; CUPS may use it for some features)
 echo "Starting D-Bus..."
 rm -f /var/run/dbus/pid

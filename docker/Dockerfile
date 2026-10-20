@@ -11,10 +11,11 @@ RUN apt-get update && apt-get install -y \
     cups-client \
     cups-filters \
     cups-bsd \
-    cups-pdf \
+    printer-driver-cups-pdf \
     printer-driver-gutenprint \
     printer-driver-hpcups \
     printer-driver-brlaser \
+    foomatic-db \
     hplip \
     samba \
     samba-common-bin \
