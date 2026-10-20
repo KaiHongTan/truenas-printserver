@@ -133,6 +133,20 @@ Without host network you must **publish ports** (631 TCP, 445/139 TCP, 137–138
 2. **Administration** → **Add Printer** → choose the printer (e.g. USB)
 3. Enable **Share This Printer**, pick a driver, save
 
+Bundled drivers: Gutenprint, HPLIP/hpcups, and [brlaser](https://github.com/pdewacht/brlaser) (Brother monochrome lasers), plus driverless IPP Everywhere for modern network printers.
+
+### Use your own HTTPS certificate (optional)
+
+By default CUPS serves `https://<NAS>:631` with an auto-generated self-signed certificate, which browsers such as Firefox flag. To serve a certificate you already trust (e.g. one TrueNAS manages, kept on the host under `/etc/certificates`), mount it read-only and set:
+
+| Env var | Example |
+|---------|---------|
+| `CUPS_SSL_CERT` | `/certs/mycert.crt` (PEM, full chain) |
+| `CUPS_SSL_KEY` | `/certs/mycert.key` (PEM) |
+| `CUPS_SSL_HOSTNAME` | `nas.example.com`, the name in the certificate that you browse to |
+
+The certificate is copied into `/config/cups/ssl` on every start, so restart the app after it renews. Leave the variables unset to keep the self-signed behaviour.
+
 ### Clients
 
 - **Windows**: Settings → Printers, or `\\<NAS-IP>\<printer-name>`

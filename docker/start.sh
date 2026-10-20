@@ -52,6 +52,33 @@ if [ ! -d "${PERSISTENT_CUPS_DIR}/ssl" ]; then
     mkdir -p "${PERSISTENT_CUPS_DIR}/ssl"
 fi
 
+# Optional: serve the CUPS web UI with your own certificate (e.g. one managed by TrueNAS)
+# instead of the auto-generated self-signed one. CUPS picks ssl/<name>.crt/.key where <name>
+# is the reverse-DNS name of the address the client connected to (falling back to the server
+# name), so the certificate is installed under every name that lookup can return.
+# Re-copied on every start, so restart the app after a renewal.
+if [ -n "${CUPS_SSL_CERT:-}" ] || [ -n "${CUPS_SSL_KEY:-}" ]; then
+    if [ -n "${CUPS_SSL_HOSTNAME:-}" ] && [ -r "${CUPS_SSL_CERT:-}" ] && [ -r "${CUPS_SSL_KEY:-}" ]; then
+        SSL_NAMES="${CUPS_SSL_HOSTNAME} $(hostname) $(hostname -f 2>/dev/null || true)"
+        for ip in $(hostname -I 2>/dev/null || true); do
+            SSL_NAMES="${SSL_NAMES} $(getent hosts "$ip" | awk '{print $2}')"
+        done
+        for name in $(printf '%s\n' ${SSL_NAMES} | sort -u); do
+            echo "Installing custom CUPS certificate as ${name}..."
+            cp "${CUPS_SSL_CERT}" "${PERSISTENT_CUPS_DIR}/ssl/${name}.crt"
+            cp "${CUPS_SSL_KEY}" "${PERSISTENT_CUPS_DIR}/ssl/${name}.key"
+            chmod 644 "${PERSISTENT_CUPS_DIR}/ssl/${name}.crt"
+            chmod 600 "${PERSISTENT_CUPS_DIR}/ssl/${name}.key"
+        done
+        # CUPS answers 400 Bad Request to Host headers it does not recognise
+        if ! grep -qxF "ServerAlias ${CUPS_SSL_HOSTNAME}" "${PERSISTENT_CUPS_DIR}/cupsd.conf"; then
+            echo "ServerAlias ${CUPS_SSL_HOSTNAME}" >> "${PERSISTENT_CUPS_DIR}/cupsd.conf"
+        fi
+    else
+        echo "Warning: CUPS_SSL_CERT, CUPS_SSL_KEY and CUPS_SSL_HOSTNAME must all be set and readable; keeping the self-signed certificate."
+    fi
+fi
+
 # Force permissions on the ssl directory so 'lp' user can write keys there
 echo "Setting permissions for CUPS SSL directory..."
 chown -R lp:lp "${PERSISTENT_CUPS_DIR}/ssl"
