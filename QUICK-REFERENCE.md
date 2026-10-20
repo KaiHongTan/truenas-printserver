@@ -194,6 +194,10 @@ docker pull ghcr.io/kaihongtan/truenas-printserver:latest
 | AVAHI_IPV6 | true | Enable IPv6 |
 | AVAHI_HOSTNAME | truenas-print | mDNS hostname |
 | AVAHI_DOMAIN | local | mDNS domain |
+| CUPS_ADMIN_PASSWORD | (unset: `admin`) | Password for the `cups-admin` login |
+| CUPS_SSL_CERT | (unset) | PEM certificate (full chain) for the CUPS web UI |
+| CUPS_SSL_KEY | (unset) | PEM private key for `CUPS_SSL_CERT` |
+| CUPS_SSL_HOSTNAME | (unset) | Hostname in the certificate that clients browse to |
 
 ## Support Resources
 

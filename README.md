@@ -48,6 +48,8 @@ Choose one method. **Host networking** is recommended (same default as the legac
    | `AVAHI_DOMAIN` | `local` |
    | `AVAHI_PUBLISH_MODE` | `host` (recommended on TrueNAS — see below) |
    | `AIRPRINT_SERVICES_DIR` | `/airprint/avahi-services` (must match the AirPrint storage mount) |
+   | `CUPS_ADMIN_PASSWORD` | Optional. Replaces the default `cups-admin` / `admin` login password |
+   | `CUPS_SSL_CERT`, `CUPS_SSL_KEY`, `CUPS_SSL_HOSTNAME` | Optional. Serve your own HTTPS certificate — see [below](#use-your-own-https-certificate-optional) |
 
 8. **TrueNAS and Avahi (AirPrint discovery)**  
    TrueNAS already runs **Avahi** on the host. With **host networking**, starting a second Avahi inside the container competes for **UDP 5353**, so generated `AirPrint-*.service` files may never be advertised. **Fix:** set `AVAHI_PUBLISH_MODE=host`, set `AIRPRINT_SERVICES_DIR` to a path such as `/airprint/avahi-services`, and add storage:
