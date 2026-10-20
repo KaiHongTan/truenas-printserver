@@ -38,6 +38,8 @@ services:
       # AVAHI_PUBLISH_MODE: container and remove the /airprint/avahi-services mount; add /config/avahi if needed.
       AVAHI_PUBLISH_MODE: host
       AIRPRINT_SERVICES_DIR: /airprint/avahi-services
+      # Optional: replace the default CUPS admin password (login: cups-admin / admin).
+      # CUPS_ADMIN_PASSWORD: change-me
       # Optional: serve the CUPS web UI with your own certificate instead of a self-signed one
       # (uncomment together with the /certs mount below).
       # CUPS_SSL_CERT: /certs/mycert.crt
